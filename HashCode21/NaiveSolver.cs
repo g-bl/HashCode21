@@ -112,6 +112,9 @@ namespace HashCode21
              *  Solver
              **************************************************************************************/
 
+            // Remove unused streets
+            List<string> usefullStreets = carPathes.SelectMany(cP => cP.Streets).Distinct().ToList();
+            
             // Initialize Intersection (Schedules)
             for (int i = 0; i < I; i++)
             {
@@ -126,9 +129,10 @@ namespace HashCode21
             // Fill intersections with incoming streets
             foreach (Street street in streets)
             {
-                if (schedules[street.E].GreenLightSchedules.Where(g => g.StreetName == street.Name).Count() == 0) // If the intersection doesn't have this incoming street yet
+                if (usefullStreets.Contains(street.Name) &&
+                    schedules[street.E].GreenLightSchedules.Where(g => g.StreetName == street.Name).Count() == 0) // If the intersection doesn't have this incoming street yet
                 {
-                    // RANDOM ORDER : FIRT IN, FIRST GREEN
+                    // RANDOM ORDER: FIRT IN, FIRST GREEN
                     schedules[street.E].GreenLightSchedules.Add(new GreenlightSchedule() // Only "E" (stop of a street) is an incoming street of an intersection 
                     {
                         Duration = 1, // CHRISTMAS TREE!
@@ -137,6 +141,9 @@ namespace HashCode21
                     schedules[street.E].Ei++;
                 }
             }
+
+            // Clean schedules
+            schedules = schedules.Where(s => s.GreenLightSchedules.Count() > 0).ToList();
 
             /**************************************************************************************
              *  Output
