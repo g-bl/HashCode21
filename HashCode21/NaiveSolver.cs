@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace HashCode21
 {
-    // MODEL
+    // Input model
+
     public class Street
     {
         public int B; // the intersection at the start
@@ -23,11 +24,13 @@ namespace HashCode21
         public List<string> Streets; // The car starts at the end of first street and follows the path until the end of the last street
     }
 
+    // Output model
+
     public class IntersectionSchedule
     {
         public int i; // the ID of the intersection
         public int Ei; // the number of incoming streets (of the intersection i) covered by this schedule
-        public List<GreenlightSchedule> greenLightSchedules;
+        public List<GreenlightSchedule> GreenLightSchedules;
     }
 
     public class GreenlightSchedule
@@ -35,8 +38,6 @@ namespace HashCode21
         public string StreetName; // the street name
         public int Duration; // for how long each street will have a green light
     }
-
-    // SOLVER
 
     class NaiveSolver
     {
@@ -111,7 +112,31 @@ namespace HashCode21
              *  Solver
              **************************************************************************************/
 
+            // Initialize Intersection (Schedules)
+            for (int i = 0; i < I; i++)
+            {
+                schedules.Add(new IntersectionSchedule()
+                {
+                    i = i,
+                    Ei = 0,
+                    GreenLightSchedules = new List<GreenlightSchedule>()
+                });
+            }
 
+            // Fill intersections with incoming streets
+            foreach (Street street in streets)
+            {
+                if (schedules[street.E].GreenLightSchedules.Where(g => g.StreetName == street.Name).Count() == 0) // If the intersection doesn't have this incoming street yet
+                {
+                    // RANDOM ORDER : FIRT IN, FIRST GREEN
+                    schedules[street.E].GreenLightSchedules.Add(new GreenlightSchedule() // Only "E" (stop of a street) is an incoming street of an intersection 
+                    {
+                        Duration = 1, // CHRISTMAS TREE!
+                        StreetName = street.Name
+                    });
+                    schedules[street.E].Ei++;
+                }
+            }
 
             /**************************************************************************************
              *  Output
@@ -128,7 +153,7 @@ namespace HashCode21
                     outputFile.WriteLine(schedule.i);
                     outputFile.WriteLine(schedule.Ei);
 
-                    foreach (GreenlightSchedule greenLightSchedule in schedule.greenLightSchedules)
+                    foreach (GreenlightSchedule greenLightSchedule in schedule.GreenLightSchedules)
                     {
                         outputFile.WriteLine(greenLightSchedule.StreetName + " " + greenLightSchedule.Duration);
                     }
