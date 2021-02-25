@@ -132,10 +132,10 @@ namespace HashCode21
                 if (usefullStreets.Contains(street.Name) &&
                     schedules[street.E].GreenLightSchedules.Where(g => g.StreetName == street.Name).Count() == 0) // If the intersection doesn't have this incoming street yet
                 {
-                    // RANDOM ORDER: FIRT IN, FIRST GREEN
+                    // Order will be updated (but almost no impact)
                     schedules[street.E].GreenLightSchedules.Add(new GreenlightSchedule() // Only "E" (stop of a street) is an incoming street of an intersection 
                     {
-                        Duration = 1, // CHRISTMAS TREE!
+                        Duration = 1, // This will be updated with weighted value
                         StreetName = street.Name
                     });
                     schedules[street.E].Ei++;
@@ -181,7 +181,7 @@ namespace HashCode21
                 }
             }
 
-            // Sort greenlights
+            // Sort greenlights (almost no impact)
             foreach (IntersectionSchedule intersect in schedules)
             {
                 intersect.GreenLightSchedules = intersect.GreenLightSchedules.OrderByDescending(gLS => gLS.Duration).ToList();
