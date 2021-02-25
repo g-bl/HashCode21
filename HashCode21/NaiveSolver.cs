@@ -146,8 +146,8 @@ namespace HashCode21
             schedules = schedules.Where(s => s.GreenLightSchedules.Count() > 0).ToList();
 
             // Give more duration to busy streets
-            int maxGreenDuration = 5;
-
+            int maxGreenDuration = 6;
+            
             // Building weight map
             Dictionary<string, int> streetPathCounter = new Dictionary<string, int>();
             foreach (CarPath carPath in carPathes)
@@ -176,7 +176,15 @@ namespace HashCode21
                 foreach (GreenlightSchedule gLS in intersect.GreenLightSchedules)
                 {
                     gLS.Duration = (int)Math.Ceiling((float)streetPathCounter[gLS.StreetName] / (float)maxWeight * maxGreenDuration);
+
+                    Math.Clamp(gLS.Duration, 1, maxGreenDuration);
                 }
+            }
+
+            // Sort greenlights
+            foreach (IntersectionSchedule intersect in schedules)
+            {
+                intersect.GreenLightSchedules = intersect.GreenLightSchedules.OrderByDescending(gLS => gLS.Duration).ToList();
             }
 
             /**************************************************************************************
